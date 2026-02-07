@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Puthenveettil House - Family Tree</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    background: linear-gradient(to right,#134E5E,#71B280);
+    overflow:hidden;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+    color:white;
+    flex-wrap:wrap;
+}
+
+.search-container{
+    display:flex;
+    gap:5px;
+}
+
+input{
+    padding:6px;
+    border-radius:5px;
+    border:none;
+}
+
+button{
+    padding:6px 10px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    background:#1f3c88;
+    color:white;
+}
+
+button:hover{ background:#163172; }
+
+.tree-wrapper{
+    width:100vw;
+    height:85vh;
+    overflow:hidden;
+    cursor:grab;
+}
+
+.tree{
+    transform-origin:0 0;
+    transition: transform 0.1s ease;
+    padding:20px;
+}
+
+.tree ul{
+    list-style:none;
+    padding-left:30px;
+    position:relative;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height 0.4s ease, opacity 0.3s ease;
+}
+
+.tree ul.open{
+    max-height:5000px;
+    opacity:1;
+}
+
+.tree li{
+    position:relative;
+    margin:15px 0;
+    padding-left:20px;
+}
+
+.tree li::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    width:2px;
+    height:100%;
+    background:#ccc;
+}
+
+.tree li::after{
+    content:'';
+    position:absolute;
+    top:20px;
+    left:0;
+    width:20px;
+    height:2px;
+    background:#ccc;
+}
+
+.tree > ul > li::before,
+.tree > ul > li::after{
+    display:none;
+}
+
+.member{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px 14px;
+    border-radius:6px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.2);
+    cursor:pointer;
+    transition:0.3s;
+    color:white;
+    min-width:320px;
+}
+
+.member:hover{
+    transform:scale(1.05);
+}
+
+/* PHOTO */
+
+.photo{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:#ffffff55;
+    border:2px solid white;
+    object-fit:cover;
+}
+
+/* DETAILS */
+
+.details{
+    display:flex;
+    flex-direction:column;
+    font-size:12px;
+    line-height:1.4;
+}
+
+.name{
+    font-weight:bold;
+    font-size:14px;
+}
+
+/* COLORS */
+
+.gen-0{ background:#2c3e50; }
+.gen-1{ background:#8e44ad; }
+.gen-2{ background:#2980b9; }
+.gen-3{ background:#27ae60; }
+.gen-4{ background:#e67e22; }
+.gen-5{ background:#c0392b; }
+
+/* SEARCH HIGHLIGHT */
+
+.highlight{
+    box-shadow:0 0 15px 5px yellow;
+    animation:pulse 1s infinite alternate;
+}
+
+@keyframes pulse{
+    from{box-shadow:0 0 10px 3px yellow;}
+    to{box-shadow:0 0 20px 8px orange;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2 style="margin:0;">Puthenveettil House</h2>
+    <div class="search-container">
+        <input type="text" id="searchBox" placeholder="Search name...">
+        <button onclick="searchPerson()">Search</button>
+    </div>
+</header>
+
+<div class="tree-wrapper" id="treeWrapper">
+    <div class="tree" id="tree">
+        <ul id="treeRoot" class="open"></ul>
+    </div>
+</div>
+
+<script>
+
+/* ========= DOB ========= */
+
+const dobData={
+"JOMAL":"26th August 1995",
+"JOMET":"27th March 1997",
+"AKHIL":"04th April 2000",
+"SUNNY":"9th February 1966",
+"JOLLY":"8th April 1971"
+};
+
+/* ========= WEDDING ========= */
+
+const weddingData={
+"SUNNY & JOLLY":"26th November 1994"
+};
+
+/* ========= FAMILY NAME ========= */
+
+const familyNameData={
+"SUNNY & JOLLY":"Poomkudiyil"
+};
+
+/* ========= FULL FAMILY ========= */
+
+const familyData={
+name:"Chachan & Ammachi",
+children:[
+{
+name:"KUTTYAMMA & JOSE",
+children:[
+{name:"JOJI & BINDHU",children:[{name:"SHONE"},{name:"ANJELINA"}]},
+{name:"JIJU & SIJI",children:[{name:"ALPHONSA"},{name:"JOHAN"},{name:"TESSA"}]}
+]
+},
+{
+name:"ROSAMMA & KUTTAPPAN",
+children:[
+{name:"ASHA & JOJI",children:[{name:"AJITH"},{name:"EVANA"}]},
+{name:"AJESH & MANJU",children:[{name:"ANJELA"},{name:"AMIT"},{name:"ANRIYA"},{name:"ADON"}]},
+{name:"ANOOP (Priest)"}
+]
+},
+{
+name:"GEORGE & HONEY",
+children:[
+{name:"NYJIL & MERLIN",children:[{name:"NOVLIN"},{name:"HANNA"}]},
+{name:"NITHIL & NIMMI",children:[{name:"NORVIN"},{name:"NOVAN"}]},
+{name:"NOEL"}
+]
+},
+{
+name:"LEELAMMA & BABY",
+children:[
+{name:"JINTO & SHERLY",children:[{name:"MARYA"},{name:"EVENA"},{name:"JACOB"}]},
+{name:"JISHA & ALEX",children:[{name:"ELSA"},{name:"JEROME"}]}
+]
+},
+{
+name:"JOSE & SOFY",
+children:[
+{name:"MINNU & JIBIN"},
+{name:"DONA & BESTIAN",children:[{name:"EDAN"},{name:"ERICK"}]},
+{name:"IWIN"}
+]
+},
+{
+name:"VALSAMMA & THANKACHAN",
+children:[
+{name:"ARUN & SNEHA",children:[{name:"ESTHER"}]},
+{name:"KIRAN & JOSTIN",children:[{name:"NORAH"},{name:"SARAH"}]},
+{name:"VARUN"}
+]
+},
+{
+name:"TOMI & LUSAMMA",
+children:[
+{name:"ATHIRA & EBY",children:[{name:"AGNES"}]},
+{name:"ANJANA & PRINCE",children:[{name:"GABRIEL"}]},
+{name:"AKHIL"}
+]
+},
+{
+name:"SUNNY & JOLLY",
+children:[{name:"JOMAL"},{name:"JOMET"}]
+},
+{
+name:"SAJI & SINI",
+children:[{name:"JOEL"},{name:"JAKE"},{name:"JADE"},{name:"JOHANNA"}]
+},
+{
+name:"SABU & BLESSY",
+children:[{name:"DON"},{name:"KARREN"},{name:"JOHAN"}]
+}
+]
+};
+
+/* ========= BUILD TREE ========= */
+
+function buildTree(node,parent,generation){
+
+let li=document.createElement("li");
+
+let div=document.createElement("div");
+div.className="member gen-"+generation;
+
+/* PHOTO */
+let photo=document.createElement("img");
+photo.className="photo";
+
+/* DETAILS */
+let details=document.createElement("div");
+details.className="details";
+
+let name=document.createElement("div");
+name.className="name";
+name.innerText=node.name;
+
+let upper=node.name.toUpperCase();
+
+/* ===== COUPLE FORMAT ===== */
+
+if(upper.includes("&")){
+
+let secondName=upper.split("&")[1].trim();
+
+let familyLine=document.createElement("div");
+familyLine.innerText= secondName+" - Family name : "+(familyNameData[upper] || "");
+
+let dobLine=document.createElement("div");
+
+let people=upper.split("&");
+
+let dobText=people.map(p=>{
+let person=p.trim();
+return dobData[person] ? person+": "+dobData[person] : person+": ";
+}).join(" | ");
+
+dobLine.innerText="DOB: "+dobText;
+
+let weddingLine=document.createElement("div");
+weddingLine.innerText="Wedding : "+(weddingData[upper] || "");
+
+details.appendChild(name);
+details.appendChild(familyLine);
+details.appendChild(dobLine);
+details.appendChild(weddingLine);
+
+}else{
+
+let dob=document.createElement("div");
+dob.innerText="DOB: "+(dobData[upper] || "");
+
+details.appendChild(name);
+details.appendChild(dob);
+}
+
+div.appendChild(photo);
+div.appendChild(details);
+li.appendChild(div);
+
+if(node.children && node.children.length>0){
+
+let ul=document.createElement("ul");
+
+div.onclick=function(){
+ul.classList.toggle("open");
+};
+
+node.children.forEach(child=>{
+buildTree(child,ul,generation+1);
+});
+
+li.appendChild(ul);
+}
+
+parent.appendChild(li);
+}
+
+buildTree(familyData,document.getElementById("treeRoot"),0);
+
+/* ========= SEARCH ========= */
+
+function searchPerson(){
+
+let name=document.getElementById("searchBox").value.trim().toUpperCase();
+if(!name) return;
+
+document.querySelectorAll(".member").forEach(m=>{
+m.classList.remove("highlight");
+});
+
+document.querySelectorAll(".tree ul").forEach(ul=>{
+if(ul.id !== "treeRoot") ul.classList.remove("open");
+});
+
+let members=document.querySelectorAll(".member");
+
+for(let div of members){
+
+if(div.innerText.toUpperCase().includes(name)){
+
+let current=div;
+
+while(current){
+
+let li=current.closest("li");
+if(!li) break;
+
+let childUL=li.querySelector("ul");
+if(childUL){
+childUL.classList.add("open");
+}
+
+let parentUL=li.parentElement;
+let parentLI=parentUL.closest("li");
+
+if(parentLI){
+current=parentLI.querySelector(".member");
+}else{
+break;
+}
+}
+
+div.classList.add("highlight");
+div.scrollIntoView({behavior:"smooth",block:"center"});
+break;
+}
+}
+}
+
+/* ========= ZOOM + PAN ========= */
+
+let scale=1,posX=0,posY=0;
+let tree=document.getElementById("tree");
+let wrapper=document.getElementById("treeWrapper");
+
+wrapper.addEventListener("wheel",function(e){
+e.preventDefault();
+scale+=e.deltaY*-0.001;
+scale=Math.min(Math.max(.5,scale),3);
+updateTransform();
+});
+
+let isDragging=false,startX,startY;
+
+wrapper.addEventListener("mousedown",e=>{
+isDragging=true;
+startX=e.clientX-posX;
+startY=e.clientY-posY;
+wrapper.style.cursor="grabbing";
+});
+
+wrapper.addEventListener("mouseup",()=>{
+isDragging=false;
+wrapper.style.cursor="grab";
+});
+
+wrapper.addEventListener("mousemove",e=>{
+if(!isDragging) return;
+posX=e.clientX-startX;
+posY=e.clientY-startY;
+updateTransform();
+});
+
+function updateTransform(){
+tree.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;
+}
+
+</script>
+
+</body>
+</html>
